@@ -1,0 +1,47 @@
+- pipeline: "Build, Test, and Push to ECR"
+  trigger_mode: "ON_EVERY_PUSH"
+  ref_name: "main"
+  ref_type: "BRANCH"
+  trigger_condition: "ALWAYS"
+  actions:
+    - action: "Build and test API"
+      type: "BUILD"
+      working_directory: "api"
+      docker_image_name: "golang"
+      docker_image_tag: "1.22"
+      execute_commands:
+        - go mod download
+        - go build -o main .
+        - go test ./...
+
+    - action: "Build and test Frontend"
+      type: "BUILD"
+      working_directory: "front"
+      docker_image_name: "node"
+      docker_image_tag: "20"
+      execute_commands:
+        - npm ci
+        - npm run build
+        - npm test
+
+    - action: "Push API to ECR"
+      type: "DOCKER"
+      login: "${AWS_ACCESS_KEY_ID}"
+      password: "${AWS_SECRET_ACCESS_KEY}"
+      docker_image_tag: "${BUDDY_EXECUTION_REVISION}"
+      dockerfile_path: "api/Dockerfile"
+      context_path: "api"
+      registry: "ECR"
+      repository: "your-ecr-repo-api"
+      region: "your-aws-region"
+
+    - action: "Push Frontend to ECR"
+      type: "DOCKER"
+      login: "${AWS_ACCESS_KEY_ID}"
+      password: "${AWS_SECRET_ACCESS_KEY}"
+      docker_image_tag: "${BUDDY_EXECUTION_REVISION}"
+      dockerfile_path: "front/Dockerfile"
+      context_path: "front"
+      registry: "ECR"
+      repository: "your-ecr-repo-frontend"
+      region: "your-aws-region"
