@@ -29,6 +29,10 @@ delete-table-in-dev:
 	docker exec marble-postgres psql -U postgres -d marble -c "DROP TABLE IF EXISTS \"org-Xendit\".\"$(TABLE_NAME)\""
 	docker exec marble-postgres psql -U postgres -d marble -c "DELETE FROM \"marble\".\"data_model_tables\" WHERE name='$(TABLE_NAME)'"
 
+delete-table-in-ec2:
+	ssh marble 'psql -h marble-postgres.cluster-cinsxnyd7pwn.ap-southeast-1.rds.amazonaws.com -U postgres -d marble -c "DROP TABLE IF EXISTS \"org-Xendit\".\"$(TABLE_NAME)\"" && \
+	psql -h marble-postgres.cluster-cinsxnyd7pwn.ap-southeast-1.rds.amazonaws.com -U postgres -d marble -c "DELETE FROM \"marble\".\"data_model_tables\" WHERE name='"'"'$(TABLE_NAME)'"'"'"'
+
 # Following targets require ~/.ssh/config to be set up
 # Create SSH Config inside ~/.ssh/config
 # ```
