@@ -25,6 +25,10 @@ restore-db-to-dev:
 	docker exec marble-postgres pg_restore -U postgres -d marble -j 4 /tmp/backup
 	docker-compose start api cron app firebase_auth
 
+delete-table-in-dev:
+	docker exec marble-postgres psql -U postgres -d marble -c "DROP TABLE IF EXISTS \"org-Xendit\".\"$(TABLE_NAME)\""
+	docker exec marble-postgres psql -U postgres -d marble -c "DELETE FROM \"marble\".\"data_model_tables\" WHERE name='$(TABLE_NAME)'"
+
 # Following targets require ~/.ssh/config to be set up
 # Create SSH Config inside ~/.ssh/config
 # ```
